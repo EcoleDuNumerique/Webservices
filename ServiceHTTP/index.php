@@ -40,4 +40,31 @@ Flight::route("/api/departements", function(){
 
 });
 
+Flight::route("/api/ville", function(){
+
+    $departement_id = Flight::request()->query["departement_id"];
+
+    $pdo = new PDO( 
+        "mysql:host=localhost;dbname=courwebservice",
+        "root",
+        "root"
+    );
+
+    $query = 
+        "SELECT ville_id, ville_nom
+        FROM villes_france_free 
+        WHERE ville_departement=:departement_id
+        ORDER BY ville_nom_reel";
+
+    $prep = $pdo->prepare( $query );
+    $prep->execute( [
+        "departement_id" => $departement_id
+    ] );
+
+    $result = $prep->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode( $result );
+
+});
+
 Flight::start();
