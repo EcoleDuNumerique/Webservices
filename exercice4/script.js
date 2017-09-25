@@ -4,6 +4,12 @@ $.ajax({
     dataType: "json",
     success: function( data ){
         console.log( data );
+        if( data.success == true ){
+
+        }
+        else if ( data.success == false ){
+
+        }
     },
     error: function( data ){
         console.log( data );

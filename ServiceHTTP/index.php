@@ -1,5 +1,9 @@
 <?php 
-require "flight/Flight.php";
+//Autorise certains sites (ici tous) à faire des requêtes cross domain
+header("Access-Control-Allow-Origin: *"); 
+
+require "flight/Flight.php"; 
+require "autoload.php";
 
 Flight::route("/api", function(){
 
@@ -64,6 +68,89 @@ Flight::route("/api/ville", function(){
     $result = $prep->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode( $result );
+
+});
+
+/*
+Flight::route("/user/login", function(){
+
+    $username = Flight::request()->query["username"];
+    $password = Flight::request()->query["password"];
+
+    $user = new User();
+    $user->setUsername( $username );
+    $user->setPassword( $password );
+
+    $bddManager = new BddManager();
+    $repo = $bddManager->getUserRepository();
+    $findedUser = $repo->getUserByUsername( $user );
+
+    $status = [
+        "success" => "",
+        "error" => "",
+        "user" => ""
+    ];
+
+    if( $findedUser == false ){
+        $status["success"] = false;
+        $status["error"] = "Identifiant incorrect";
+    }
+    else if( $findedUser->getPassword() != $user->getPassword() ){
+        $status["success"] = false;
+        $status["error"] = "Mot de passe incorrect";
+    }
+    else {
+        $status["success"] = true;
+        $status["user"] = $findedUser;
+    }
+
+    echo json_encode( $status );
+
+});
+*/
+
+Flight::route("POST /user/login", function(){
+
+    $username = Flight::request()->data["username"]; //$_POST["username"]
+    $password = Flight::request()->data["password"]; //$_POST["password"]
+
+    $pdo = new PDO( 
+        "mysql:host=localhost;dbname=courwebservice",
+        "root",
+        "root"
+    );
+
+    $query = "SELECT * FROM users WHERE username=:username";
+    $prep = $pdo->prepare( $query );
+    $prep->execute([
+        "username" => $username
+    ]);
+    $result = $prep->fetch( PDO::FETCH_ASSOC );//soit tableau soit false
+    
+    $status = [
+        "success" => false,
+        "errors" => [],
+        "user" => []
+    ];
+
+    if( $result == false ){
+        $status["success"] = false;
+        $status["errors"] = "Utilisateur non trouvé";
+    }
+    else if( $password != $result["password"]){
+        $status["success"] = false;
+        $status["errors"] = "Mot de passe incorrect";
+    }
+    else {
+        $status["success"] = true;
+        $status["user"] = $result;
+    }
+
+    echo json_encode( $status );
+
+});
+
+Flight::route("/user/signup", function(){
 
 });
 
