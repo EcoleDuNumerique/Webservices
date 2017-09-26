@@ -11,7 +11,7 @@ class Note {
 
     display(){
 
-        var div = "<div class='post-it'>";
+        var div = "<div class='post-it' data-id="+this.id+" >";
         div += "<div class='close'> X </div>";
         div += "<h2>" + this.title +  "</h2>";
         div += "<p>" + this.content + "</p>";

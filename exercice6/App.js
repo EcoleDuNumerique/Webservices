@@ -66,9 +66,8 @@ class App {
                     var note = new Note( data_note.title, data_note.content );
                     note.id = data_note.id;
                     that.addNote( note );
+                    note.display();
                 }
-
-                that.displayNotes();
 
             },
             error : function( error ){
@@ -77,16 +76,28 @@ class App {
         });
     }
 
-    displayNotes(){
-        for( var note of this.notes ) {
-            note.display();
-        }
-    }
-
     removeNote(index){
         var note = this.notes[index];
-        note.destroy();
-        this.notes.splice(index, 1); //supprime 1 élément à l'index indiqué
+        var that = this;
+        $.ajax({
+            url : "http://localhost/API/note/" + note.id,
+            method : "DELETE",
+            dataType : "json",
+            success : function( data ){
+
+                if( data.success == true ){
+                    note.destroy();
+                    that.notes.splice(index, 1);
+                }
+                else {
+                    alert("Un problème est survenu lors de la suppression !");
+                }
+
+            },
+            error : function( error ){
+                console.log(error);
+            }
+        });
     }
 
 }
