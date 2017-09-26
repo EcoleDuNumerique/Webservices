@@ -32,3 +32,9 @@ $(document).on("click", ".close", function(){
     app.removeNote( index );
 
 });
+
+$(document).on('click', '.post-it', function(){
+    var index = $('.post-it').index( $(this) );
+    var note = app.notes[index];
+    app.detail( note );
+});

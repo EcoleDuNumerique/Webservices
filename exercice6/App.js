@@ -100,4 +100,27 @@ class App {
         });
     }
 
+    detail( note ){
+
+        $.ajax({
+            url: "http://localhost/API/note/" + note.id,
+            method: "GET",
+            dataType: "json",
+            success : function( data ){
+
+                if( data.success == true ){
+                    console.log(data.note);
+                }
+                else {
+                    alert("Une erreur est survenu lors de la récupération !");
+                }
+
+            },
+            error : function( error ){
+                console.log(error);
+            }
+        })
+
+    }
+
 }
