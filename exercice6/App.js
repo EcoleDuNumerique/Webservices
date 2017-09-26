@@ -2,11 +2,15 @@ class App {
 
     constructor(){
 
-        this.$form = $("form");
+        this.$form = $("#create");
+        this.$detail = $("#detail");
+        this.$title_detail = $("#title_detail");
+        this.$content_detail = $("#content_detail");
         this.$title = $("#title");
         this.$content = $("#content");
         this.$add = $("#add");
 
+        this.lastSelectedNote = null;
         this.notes = [];
 
         //On declenche des l'instanciation
@@ -16,6 +20,7 @@ class App {
 
     reinit() {
         this.$form.slideUp(300);
+        this.$detail.fadeOut(300);
         this.$title.val("");
         this.$content.val("");
     }
@@ -102,6 +107,8 @@ class App {
 
     detail( note ){
 
+        var that = this;
+
         $.ajax({
             url: "http://localhost/API/note/" + note.id,
             method: "GET",
@@ -109,7 +116,12 @@ class App {
             success : function( data ){
 
                 if( data.success == true ){
-                    console.log(data.note);
+                    
+                    that.lastSelectedNote = note;
+                    that.$title_detail.val( data.note.title );
+                    that.$content_detail.val( data.note.content );
+                    that.$detail.fadeIn(300);
+
                 }
                 else {
                     alert("Une erreur est survenu lors de la récupération !");
@@ -119,8 +131,43 @@ class App {
             error : function( error ){
                 console.log(error);
             }
-        })
+        });
 
+    }
+
+    updateNote( note ){
+
+        var title = this.$title_detail.val();
+        var content = this.$content_detail.val();
+        var that = this;
+        //Ici pour les requetes PUT uniquement, on stringify les données
+        //avec JSON.stringify...
+        $.ajax({
+            url: "http://localhost/API/note/" + note.id,
+            method: "PUT",
+            data: JSON.stringify({
+                title: title,
+                content: content
+            }),
+            dataType: "json",
+            success : function(data){
+                
+                if( data.success == true ){
+
+                    note.$dom.children("h2").html( title );
+                    note.$dom.children("p").html( content );
+                    that.$detail.fadeOut(300);
+
+                }
+                else {
+                    alert("Problème de connection lors de la mise a jour ...");
+                }
+
+            },
+            error: function(error){
+                console.log(error);
+            }
+        })
     }
 
 }
